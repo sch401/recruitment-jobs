@@ -42,11 +42,12 @@ function educationLabel(raw) {
 
 function majorLabel(raw) {
   const value = String(raw || '').trim();
-  const ordinal = /^(?:[（(][0-9一二三四五六七八九十]{1,3}[)）]|(?:[0-9]{1,3}|[一二三四五六七八九十]{1,3})[.．、])\s*/;
+  const ordinal = /^(?:[0-9]{1,3}(?=(?:全日制|本科|硕士|博士|大专|专科|研究生))|[（(][0-9一二三四五六七八九十]{1,3}[)）]|(?:[0-9]{1,3}|[一二三四五六七八九十]{1,3})[.．、])\s*/;
   const degree = /^(?:具有|具备|拥有|要求|须有)?(?:全日制|统招|大学)?(?:博士后|博士研究生|硕士研究生|博士|硕士|本科|学士|大专|专科|研究生)(?:或(?:博士|硕士|本科))?(?:及以上|或以上|以上)?(?:学历(?:学位)?|学位|文凭|毕业生?|优先考虑|优先)?(?:者)?\s*/;
   const parts = value.split(/[。；;\r\n]+/).flatMap(part => {
     part = part.trim().replace(ordinal, '').replace(/^(?:职位描述|任职要求|学历与专业|专业要求|专业需求|招聘专业|所需专业|教育背景)\s*[:：]\s*/, '');
     if (/专业(?:要求|需求)\s*[:：]/.test(part)) part = part.replace(/^.*?专业(?:要求|需求)\s*[:：]\s*/, '');
+    part = part.replace(/^(?:(?:20)?[0-9]{2}[、,，])*(?:20)?[0-9]{2}届(?:毕业生)?\s*/, '');
     return part.split(/[，,]+/).map(item => {
       item = item.trim().replace(ordinal, '').replace(degree, '').trim();
       return item.replace(/(?:本科|硕士|博士|研究生)(?:及以上|或以上|以上)?(?:学历|学位|文凭|毕业)\s*$/, '').replace(/^[、：:]+|[、：:]+$/g, '').trim();
