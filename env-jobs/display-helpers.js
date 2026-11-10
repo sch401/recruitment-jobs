@@ -2,6 +2,7 @@ function educationInfo(raw) {
   const original = String(raw || '').normalize('NFKC').trim();
   const table = /详见|见.{0,8}(?:公告|岗位表|附件|招聘表)|具体.{0,8}(?:公告|岗位表|附件)/.test(original);
   if (!original || /^(?:原文)?未(?:注明|说明|明确)|^待核实$/.test(original)) return {levels: [], kind: 'unspecified'};
+  if (/学历不限|不限学历|不限制学历|无学历要求|^(?:不限|不限制)$/.test(original)) return {levels: [], kind: 'unrestricted'};
   let value = original;
   if (value.length > 140 || /学校简介|学位授予|申报硕士|升本以来|学院肇始/.test(value)) {
     value = value.split(/[。；;\n]/).filter(line => {
@@ -15,16 +16,17 @@ function educationInfo(raw) {
   if (/本科|本硕(?:博)?/.test(value)) levels.push('本科');
   if (/硕士|硕博|本硕(?:博)?/.test(value)) levels.push('硕士');
   if (/博士|硕博|本硕博/.test(value)) levels.push('博士');
+  if (/研究生/.test(value.replace(/(?:硕士|博士)\s*研究生/g, ''))) {
+    for (const level of ['硕士', '博士']) if (!levels.includes(level)) levels.push(level);
+  }
   if (levels.length) return {levels, kind: 'explicit'};
-  if (/学历不限|不限学历|不限制学历|无学历要求|^(?:不限|不限制)$/.test(value)) return {levels: [], kind: 'unrestricted'};
-  if (/研究生/.test(value)) return {levels: [], kind: 'graduate'};
   return {levels: [], kind: table ? 'table' : 'review'};
 }
 
 function educationMatches(raw, selected) {
   if (!selected) return true;
   const info = educationInfo(raw);
-  if (selected === 'multiple') return info.levels.length > 1;
+  if (info.kind === 'unrestricted') return true;
   return info.levels.includes(selected) || info.kind === selected;
 }
 
@@ -35,7 +37,7 @@ function educationLabel(raw) {
     if (value.length <= 24 && !/本硕|硕博/.test(value)) return value;
     return info.levels.join(' / ') + (info.levels.length === 1 && /及以上|以上学历/.test(value) ? '及以上' : '');
   }
-  return {unspecified: '未注明', table: '详见公告表', unrestricted: '不限学历', graduate: '研究生（未细分）', review: '学历需核实'}[info.kind];
+  return {unspecified: '未注明', table: '详见公告表', unrestricted: '不限学历', review: '学历需核实'}[info.kind];
 }
 
 function publicJobUrl(value) {
