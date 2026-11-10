@@ -34,8 +34,8 @@ function educationLabel(raw) {
   const info = educationInfo(raw);
   if (info.levels.length) {
     const value = String(raw || '').trim();
-    if (value.length <= 24 && !/本硕|硕博/.test(value)) return value;
-    return info.levels.join(' / ') + (info.levels.length === 1 && /及以上|以上学历/.test(value) ? '及以上' : '');
+    if (value.length <= 24 && !/本硕|硕博/.test(value)) return value.split(/[,，;；/、\r\n]+/).map(part => part.trim()).filter(Boolean).join('、');
+    return info.levels.join('、') + (info.levels.length === 1 && /及以上|以上学历/.test(value) ? '及以上' : '');
   }
   return {unspecified: '未注明', table: '详见公告表', unrestricted: '不限学历', review: '学历需核实'}[info.kind];
 }
