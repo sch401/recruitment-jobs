@@ -42,6 +42,8 @@ function educationLabel(raw) {
 
 function majorLabel(raw) {
   const value = String(raw || '').trim();
+  // Keep source headings that link major lists to their degree levels.
+  if (/(?:本科|研究生|硕士|博士)(?:专业(?:要求|条件)?)?[：:]/.test(value)) return value;
   const ordinal = /^(?:[0-9]{1,3}(?=(?:全日制|本科|硕士|博士|大专|专科|研究生))|[（(][0-9一二三四五六七八九十]{1,3}[)）]|(?:[0-9]{1,3}|[一二三四五六七八九十]{1,3})[.．、])\s*/;
   const degree = /^(?:具有|具备|拥有|要求|须有)?(?:全日制|统招|大学)?(?:博士后|博士研究生|硕士研究生|博士|硕士|本科|学士|大专|专科|研究生)(?:或(?:博士|硕士|本科))?(?:及以上|或以上|以上)?(?:学历(?:学位)?|学位|文凭|毕业生?|优先考虑|优先)?(?:者)?\s*/;
   const parts = value.split(/[。；;\r\n]+/).flatMap(part => {
